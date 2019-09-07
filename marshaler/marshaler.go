@@ -44,6 +44,8 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 
 	for i := 0; i < v.NumField(); i++ {
 		fv := v.Field(i)
+		tag := v.Type().Field(i).Tag.Get("fixed")
+		limit, _ := strconv.ParseInt(tag, 10, 64)
 
 		if fv.Kind() == reflect.Struct || fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface {
 			d, err := m.marshal(fv)
@@ -51,6 +53,7 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 				return nil, err
 			}
 
+			d = truncateRunes(limit, d)
 			data = append(data, d...)
 			continue
 		}
@@ -60,27 +63,26 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 			return nil, err
 		}
 
-		// check rune and strip
-		ft := v.Type().Field(i)
-		tag := ft.Tag.Get("fixed")
-		limit, err := strconv.ParseInt(tag, 10, 64)
-		if err != nil {
-			//todo error value not valid
-			return nil, err
-		}
-
-		padding := int(limit) - len(runes)
-		if padding < 0 {
-			runes = runes[0:limit]
-		} else {
-			paddingRunes := bytes.Runes(bytes.Repeat([]byte(" "), padding))
-			runes = append(runes, paddingRunes...)
-		}
-
+		runes = truncateRunes(limit, runes)
 		data = append(data, runes...)
 	}
 
 	return data, nil
+}
+
+func truncateRunes(limit int64, runes []rune) []rune {
+	if limit == 0 {
+		return runes
+	}
+
+	padding := int(limit) - len(runes)
+	if padding < 0 {
+		runes = runes[0:limit]
+	} else {
+		paddingRunes := bytes.Runes(bytes.Repeat([]byte(" "), padding))
+		runes = append(runes, paddingRunes...)
+	}
+	return runes
 }
 
 func extractRunes(v reflect.Value) ([]rune, error) {

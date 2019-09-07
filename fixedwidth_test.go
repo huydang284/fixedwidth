@@ -13,6 +13,15 @@ type person struct {
 	Job       string `fixed:"8"`
 }
 
+type personWithCat struct {
+	Cat cat `fixed:"13"`
+}
+
+type cat struct {
+	Name   string `fixed:"10"`
+	Gender string `fixed:"6"`
+}
+
 func TestMarshal(t *testing.T) {
 	type args struct {
 		v interface{}
@@ -61,6 +70,12 @@ func TestMarshal(t *testing.T) {
 			name:    "single line - unicode",
 			args:    args{v: p3},
 			want:    []rune("นายทดสอบ  ทดสอบ     100 Retired "),
+			wantErr: false,
+		},
+		{
+			name:    "nested struct",
+			args:    args{v: personWithCat{Cat: cat{Name: "June", Gender: "male"}}},
+			want:    []rune("June      mal"),
 			wantErr: false,
 		},
 	}
