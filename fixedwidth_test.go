@@ -6,6 +6,9 @@ import (
 	"testing"
 )
 
+func float64p(v float64) *float64 { return &v }
+func stringp(v string) *string    { return &v }
+
 type person struct {
 	FirstName string `fixed:"10"`
 	LastName  string `fixed:"10"`
@@ -34,6 +37,18 @@ type embededStruct struct {
 type embededStructWithTag struct {
 	Number int `fixed:"3"`
 	person `fixed:"15"`
+}
+
+type mixedStruct struct {
+	F1 string  `fixed:"5"`
+	F2 *string `fixed:"3"`
+	cat
+	F3 float32     `fixed:"4"`
+	F4 *float64    `fixed:"4"`
+	F5 interface{} `fixed:"6"`
+	F6 interface{} `fixed:"8"`
+	F7 cat         `fixed:"10"`
+	F8 *cat
 }
 
 func TestMarshal(t *testing.T) {
@@ -124,6 +139,31 @@ func TestMarshal(t *testing.T) {
 				},
 			}},
 			want:    []rune("15 Drogba    Didie"),
+			wantErr: false,
+		},
+		{
+			name: "mixed types",
+			args: args{v: mixedStruct{
+				F1: "the first field",
+				F2: stringp("second"),
+				cat: cat{
+					Name:   "P",
+					Gender: "female",
+				},
+				F3: 10.544,
+				F4: float64p(7.222),
+				F5: "what is nil",
+				F6: 7,
+				F7: cat{
+					Name:   "Ali",
+					Gender: "male",
+				},
+				F8: &cat{
+					Name:   "wow",
+					Gender: "male",
+				},
+			}},
+			want:    []rune("the fsecP         female10.57.22what i7       Ali       wow       male  "),
 			wantErr: false,
 		},
 	}

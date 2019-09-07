@@ -2,6 +2,7 @@ package marshaler
 
 import (
 	"bytes"
+	"fmt"
 	"reflect"
 	"strconv"
 )
@@ -36,6 +37,9 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 	}
 	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
 		v = v.Elem()
+		if v.Type().Name() == "string" {
+			fmt.Println(v.String())
+		}
 	}
 
 	if v.Kind() != reflect.Struct {
@@ -47,7 +51,11 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 		tag := v.Type().Field(i).Tag.Get("fixed")
 		limit, _ := strconv.ParseInt(tag, 10, 64)
 
-		if fv.Kind() == reflect.Struct || fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface {
+		if fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface {
+			fv = fv.Elem()
+		}
+
+		if fv.Kind() == reflect.Struct {
 			d, err := m.marshal(fv)
 			if err != nil {
 				return nil, err
