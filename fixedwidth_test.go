@@ -22,6 +22,16 @@ type cat struct {
 	Gender string `fixed:"6"`
 }
 
+type embededStruct struct {
+	Number int `fixed:"3"`
+	person
+}
+
+type embededStructWithTag struct {
+	Number int `fixed:"3"`
+	person `fixed:"15"`
+}
+
 func TestMarshal(t *testing.T) {
 	type args struct {
 		v interface{}
@@ -76,6 +86,34 @@ func TestMarshal(t *testing.T) {
 			name:    "nested struct",
 			args:    args{v: personWithCat{Cat: cat{Name: "June", Gender: "male"}}},
 			want:    []rune("June      mal"),
+			wantErr: false,
+		},
+		{
+			name: "embeded struct",
+			args: args{v: embededStruct{
+				Number: 15,
+				person: person{
+					FirstName: "Drogba",
+					LastName:  "Didier",
+					Age:       41,
+					Job:       "Retired",
+				},
+			}},
+			want:    []rune("15 Drogba    Didier    41  Retired "),
+			wantErr: false,
+		},
+		{
+			name: "embeded struct with tag",
+			args: args{v: embededStructWithTag{
+				Number: 15,
+				person: person{
+					FirstName: "Drogba",
+					LastName:  "Didier",
+					Age:       41,
+					Job:       "Retired",
+				},
+			}},
+			want:    []rune("15 Drogba    Didie"),
 			wantErr: false,
 		},
 	}
