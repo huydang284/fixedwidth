@@ -13,8 +13,12 @@ type person struct {
 	Job       string `fixed:"8"`
 }
 
-type personWithCat struct {
+type nestedStructWithTag struct {
 	Cat cat `fixed:"13"`
+}
+
+type nestedStructWithoutTag struct {
+	Cat cat
 }
 
 type cat struct {
@@ -83,13 +87,19 @@ func TestMarshal(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "nested struct",
-			args:    args{v: personWithCat{Cat: cat{Name: "June", Gender: "male"}}},
+			name:    "nested struct with tag",
+			args:    args{v: nestedStructWithTag{Cat: cat{Name: "June", Gender: "male"}}},
 			want:    []rune("June      mal"),
 			wantErr: false,
 		},
 		{
-			name: "embeded struct",
+			name:    "nested struct without tag",
+			args:    args{v: nestedStructWithoutTag{Cat: cat{Name: "June", Gender: "male"}}},
+			want:    []rune("June      male  "),
+			wantErr: false,
+		},
+		{
+			name: "embeded struct without tag",
 			args: args{v: embededStruct{
 				Number: 15,
 				person: person{
