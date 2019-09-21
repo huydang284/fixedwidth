@@ -27,10 +27,10 @@ func TestMarshal(t *testing.T) {
 		},
 	}
 	p3 := person{
-		FirstName: "นายทดสอบ",
-		LastName:  "ทดสอบ",
+		FirstName: "Huy",
+		LastName:  "Đặng",
 		Age:       100,
-		Job:       "Retired",
+		Job:       "Kỹ sư",
 	}
 	tests := []struct {
 		name    string
@@ -53,7 +53,7 @@ func TestMarshal(t *testing.T) {
 		{
 			name:    "single line - unicode",
 			args:    args{v: p3},
-			want:    []rune("นายทดสอบ  ทดสอบ     100 Retired "),
+			want:    []rune("Huy       Đặng      100 Kỹ sư   "),
 			wantErr: false,
 		},
 		{
