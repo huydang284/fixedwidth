@@ -1,7 +1,6 @@
 package fixedwidth
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -129,7 +128,6 @@ func TestMarshal(t *testing.T) {
 				t.Errorf("Marshal() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			fmt.Println(string(got))
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Marshal() got = %v, want %v", got, tt.want)
 			}
