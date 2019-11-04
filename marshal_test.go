@@ -186,6 +186,12 @@ func TestMarshal(t *testing.T) {
 			want:    []rune("the fsecP         female10.57.22what i7       Ali       wow       male  1  2  3  4  5  6  7  8  9  1  2  3  4  5  6  7  8  9  10 1.12 2.23 "),
 			wantErr: false,
 		},
+		{
+			name:    "empty struct - single line",
+			args:    args{v: person{}},
+			want:    []rune("                    0           "),
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
