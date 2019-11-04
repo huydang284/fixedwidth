@@ -10,27 +10,66 @@ func TestMarshal(t *testing.T) {
 		v interface{}
 	}
 
-	p := person{
+	singleLine := person{
 		FirstName: "Alexander",
 		LastName:  "Goodword",
 		Age:       40,
 		Job:       "Software Engineer",
 	}
-	p2 := []person{
-		p,
+	wantedSingleLine := "Alexander Goodword  40  Software"
+
+	multiLines := []person{
+		{
+			FirstName: "Alexander",
+			LastName:  "Goodword",
+			Age:       40,
+			Job:       "Software Engineer",
+		},
 		{
 			FirstName: "Frank",
 			LastName:  "Lampard",
 			Age:       41,
 			Job:       "Coach",
 		},
+		{
+			FirstName: "Mason",
+			LastName:  "Mount",
+			Age:       20,
+			Job:       "Midfielder",
+		},
 	}
-	p3 := person{
+	wantedMultiLines := "Alexander Goodword  40  Software\nFrank     Lampard   41  Coach   \nMason     Mount     20  Midfield"
+
+	singleLineUnicode := person{
 		FirstName: "Huy",
 		LastName:  "Đặng",
 		Age:       100,
 		Job:       "Kỹ sư",
 	}
+	wantedSingleLineUnicode := "Huy       Đặng      100 Kỹ sư   "
+
+	multiLinesUnicode := []person{
+		{
+			FirstName: "Huy",
+			LastName:  "Đặng",
+			Age:       25,
+			Job:       "Kỹ sư",
+		},
+		{
+			FirstName: "日本人",
+			LastName:  "の氏名",
+			Age:       30,
+			Job:       "エンジニア",
+		},
+		{
+			FirstName: "후이",
+			LastName:  "당",
+			Age:       45,
+			Job:       "기사",
+		},
+	}
+	wantedMultiLinesUnicode := "Huy       Đặng      25  Kỹ sư   \n日本人       の氏名       30  エンジニア   \n후이        당         45  기사      "
+
 	tests := []struct {
 		name    string
 		args    args
@@ -39,20 +78,26 @@ func TestMarshal(t *testing.T) {
 	}{
 		{
 			name:    "single line",
-			args:    args{v: p},
-			want:    []rune("Alexander Goodword  40  Software"),
+			args:    args{v: singleLine},
+			want:    []rune(wantedSingleLine),
 			wantErr: false,
 		},
 		{
-			name:    "double lines",
-			args:    args{v: p2},
-			want:    []rune("Alexander Goodword  40  Software\nFrank     Lampard   41  Coach   "),
+			name:    "multi lines",
+			args:    args{v: multiLines},
+			want:    []rune(wantedMultiLines),
 			wantErr: false,
 		},
 		{
 			name:    "single line - unicode",
-			args:    args{v: p3},
-			want:    []rune("Huy       Đặng      100 Kỹ sư   "),
+			args:    args{v: singleLineUnicode},
+			want:    []rune(wantedSingleLineUnicode),
+			wantErr: false,
+		},
+		{
+			name:    "multi lines - unicode",
+			args:    args{v: multiLinesUnicode},
+			want:    []rune(wantedMultiLinesUnicode),
 			wantErr: false,
 		},
 		{
@@ -116,8 +161,29 @@ func TestMarshal(t *testing.T) {
 					Name:   "wow",
 					Gender: "male",
 				},
+				F9:  intp(1),
+				F10: 2,
+				F11: int8p(3),
+				F12: 4,
+				F13: int16p(5),
+				F14: 6,
+				F15: int32p(7),
+				F16: 8,
+				F17: int64p(9),
+				F18: 1,
+				F19: uintp(2),
+				F20: 3,
+				F21: uint8p(4),
+				F22: 5,
+				F23: uint16p(6),
+				F24: 7,
+				F25: uint32p(8),
+				F26: 9,
+				F27: uint64p(10),
+				F28: float32p(1.12),
+				F29: 2.23,
 			}},
-			want:    []rune("the fsecP         female10.57.22what i7       Ali       wow       male  "),
+			want:    []rune("the fsecP         female10.57.22what i7       Ali       wow       male  1  2  3  4  5  6  7  8  9  1  2  3  4  5  6  7  8  9  10 1.12 2.23 "),
 			wantErr: false,
 		},
 	}

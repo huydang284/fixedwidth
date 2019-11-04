@@ -97,6 +97,8 @@ func extractRunes(v reflect.Value) ([]rune, error) {
 	switch v.Kind() {
 	case reflect.Int, reflect.Int64, reflect.Int32, reflect.Int16, reflect.Int8:
 		return []rune(strconv.Itoa(int(v.Int()))), nil
+	case reflect.Uint, reflect.Uint64, reflect.Uint32, reflect.Uint16, reflect.Uint8:
+		return []rune(strconv.FormatUint(v.Uint(), 10)), nil
 	case reflect.Float32:
 		return []rune(strconv.FormatFloat(v.Float(), 'f', 2, 32)), nil
 	case reflect.Float64:
