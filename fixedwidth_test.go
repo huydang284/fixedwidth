@@ -75,4 +75,5 @@ type mixedStruct struct {
 	F27 *uint64  `fixed:"3"`
 	F28 *float32 `fixed:"5"`
 	F29 float64  `fixed:"5"`
+	F30 *string  `fixed:"2"`
 }
