@@ -7,8 +7,7 @@ import (
 	"strconv"
 )
 
-type Marshaler struct {
-}
+type Marshaler struct{}
 
 func New() Marshaler {
 	return Marshaler{}
@@ -66,11 +65,7 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 			continue
 		}
 
-		runes, err := extractRunes(fv)
-		if err != nil {
-			return nil, err
-		}
-
+		runes := extractRunes(fv)
 		runes = truncateRunes(limit, runes)
 		data = append(data, runes...)
 	}
@@ -93,19 +88,19 @@ func truncateRunes(limit int64, runes []rune) []rune {
 	return runes
 }
 
-func extractRunes(v reflect.Value) ([]rune, error) {
+func extractRunes(v reflect.Value) []rune {
 	switch v.Kind() {
 	case reflect.Int, reflect.Int64, reflect.Int32, reflect.Int16, reflect.Int8:
-		return []rune(strconv.Itoa(int(v.Int()))), nil
+		return []rune(strconv.Itoa(int(v.Int())))
 	case reflect.Uint, reflect.Uint64, reflect.Uint32, reflect.Uint16, reflect.Uint8:
-		return []rune(strconv.FormatUint(v.Uint(), 10)), nil
+		return []rune(strconv.FormatUint(v.Uint(), 10))
 	case reflect.Float32:
-		return []rune(strconv.FormatFloat(v.Float(), 'f', 2, 32)), nil
+		return []rune(strconv.FormatFloat(v.Float(), 'f', 2, 32))
 	case reflect.Float64:
-		return []rune(strconv.FormatFloat(v.Float(), 'f', 2, 64)), nil
+		return []rune(strconv.FormatFloat(v.Float(), 'f', 2, 64))
 	case reflect.String:
-		return []rune(v.String()), nil
+		return []rune(v.String())
 	}
 
-	return nil, nil
+	return nil
 }
