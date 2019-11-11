@@ -77,3 +77,37 @@ type mixedStruct struct {
 	F29 float64  `fixed:"5"`
 	F30 *string  `fixed:"2"`
 }
+
+type mixedStructForUnmarshal struct {
+	F1 string  `fixed:"5"`
+	F2 *string `fixed:"3"`
+	cat
+	F3  float32     `fixed:"4"`
+	F4  *float64    `fixed:"4"`
+	F5  interface{} `fixed:"6"`
+	F6  interface{} `fixed:"8"`
+	F7  cat         `fixed:"10"`
+	F8  *cat
+	F9  *int     `fixed:"3"`
+	F10 int8     `fixed:"3"`
+	F11 *int8    `fixed:"3"`
+	F12 int16    `fixed:"3"`
+	F13 *int16   `fixed:"3"`
+	F14 int32    `fixed:"3"`
+	F15 *int32   `fixed:"3"`
+	F16 int64    `fixed:"3"`
+	F17 *int64   `fixed:"3"`
+	F18 uint     `fixed:"3"`
+	F19 *uint    `fixed:"3"`
+	F20 uint8    `fixed:"3"`
+	F21 *uint8   `fixed:"3"`
+	F22 uint16   `fixed:"3"`
+	F23 *uint16  `fixed:"3"`
+	F24 uint32   `fixed:"3"`
+	F25 *uint32  `fixed:"3"`
+	F26 uint64   `fixed:"3"`
+	F27 *uint64  `fixed:"3"`
+	F28 *float32 `fixed:"5"`
+	F29 float64  `fixed:"5"`
+	F30 *string  `fixed:"2"`
+}
