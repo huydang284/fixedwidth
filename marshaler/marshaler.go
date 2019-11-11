@@ -2,7 +2,6 @@ package marshaler
 
 import (
 	"bytes"
-	"fmt"
 	"reflect"
 	"strconv"
 )
@@ -34,11 +33,9 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 		}
 		return data, nil
 	}
+
 	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
 		v = v.Elem()
-		if v.Type().Name() == "string" {
-			fmt.Println(v.String())
-		}
 	}
 
 	if v.Kind() != reflect.Struct {

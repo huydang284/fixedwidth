@@ -2,7 +2,6 @@ package unmarshaler
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -68,9 +67,6 @@ func (m Unmarshaler) unmarshalStruct(data []rune, modelValue reflect.Value) (int
 		var err error
 		var uLen int
 		if limit == 0 && isStructOrStructPointer(fieldType.Type) {
-			//if fieldValue.Kind() == reflect.Ptr {
-			//	fieldValue = fieldValue.Elem()
-			//}
 			uLen, err = m.unmarshal(data[index:], fieldValue, fieldType.Type)
 		} else {
 			pivot := index + limit
@@ -78,7 +74,6 @@ func (m Unmarshaler) unmarshalStruct(data []rune, modelValue reflect.Value) (int
 				pivot = len(data)
 			}
 
-			fmt.Println(string(data[index:pivot]))
 			uLen, err = m.unmarshal(data[index:pivot], fieldValue, fieldType.Type)
 		}
 
