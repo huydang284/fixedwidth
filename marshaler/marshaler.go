@@ -19,14 +19,16 @@ func (m Marshaler) Marshal(i interface{}) ([]rune, error) {
 func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 	var data []rune
 
-	if v.Kind() == reflect.Slice {
-		for i := 0; i < v.Len(); i++ {
+	vKind := v.Kind()
+	if vKind == reflect.Slice {
+		vLen := v.Len()
+		for i := 0; i < vLen; i++ {
 			r, err := m.marshal(v.Index(i))
 			if err != nil {
 				return nil, err
 			}
 
-			if i != v.Len()-1 {
+			if i != vLen-1 {
 				r = append(r, '\n')
 			}
 			data = append(data, r...)
@@ -34,17 +36,18 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 		return data, nil
 	}
 
-	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+	if vKind == reflect.Ptr || vKind == reflect.Interface {
 		v = v.Elem()
 	}
 
-	if v.Kind() != reflect.Struct {
+	if vKind != reflect.Struct {
 		return nil, nil
 	}
 
+	vType := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		fv := v.Field(i)
-		tag := v.Type().Field(i).Tag.Get("fixed")
+		tag := vType.Field(i).Tag.Get("fixed")
 		limit, _ := strconv.ParseInt(tag, 10, 64)
 
 		if fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface {
