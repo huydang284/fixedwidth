@@ -1,5 +1,5 @@
 .idea
-cpu.out
+*.out
 fixedwidth.test
 old
 new

@@ -54,19 +54,19 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 			fv = fv.Elem()
 		}
 
+		var runes []rune
 		if fv.Kind() == reflect.Struct {
 			d, err := m.marshal(fv)
 			if err != nil {
 				return nil, err
 			}
 
-			d = truncateRunes(limit, d)
-			data = append(data, d...)
-			continue
+			runes = truncateRunes(limit, d)
+		} else {
+			runes = extractRunes(fv)
+			runes = truncateRunes(limit, runes)
 		}
 
-		runes := extractRunes(fv)
-		runes = truncateRunes(limit, runes)
 		data = append(data, runes...)
 	}
 
