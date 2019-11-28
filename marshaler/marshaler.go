@@ -6,34 +6,39 @@ import (
 	"strconv"
 )
 
-type Marshaler struct{}
+type Marshaler struct {
+	r []rune
+}
 
 func New() Marshaler {
 	return Marshaler{}
 }
 
-func (m Marshaler) Marshal(i interface{}) ([]rune, error) {
-	return m.marshal(reflect.ValueOf(i))
+func (m *Marshaler) Marshal(i interface{}) ([]rune, error) {
+	m.reset()
+	err := m.marshal(reflect.ValueOf(i))
+	return m.r, err
 }
 
-func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
-	var data []rune
+func (m *Marshaler) reset() {
+	m.r = m.r[:0]
+}
 
+func (m *Marshaler) marshal(v reflect.Value) error {
 	vKind := v.Kind()
 	if vKind == reflect.Slice {
 		vLen := v.Len()
 		for i := 0; i < vLen; i++ {
-			r, err := m.marshal(v.Index(i))
+			err := m.marshal(v.Index(i))
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 			if i != vLen-1 {
-				r = append(r, '\n')
+				m.r = append(m.r, '\n')
 			}
-			data = append(data, r...)
 		}
-		return data, nil
+		return nil
 	}
 
 	if vKind == reflect.Ptr || vKind == reflect.Interface {
@@ -41,7 +46,7 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 	}
 
 	if vKind != reflect.Struct {
-		return nil, nil
+		return nil
 	}
 
 	vType := v.Type()
@@ -49,6 +54,7 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 		fv := v.Field(i)
 		tag := vType.Field(i).Tag.Get("fixed")
 		limit, _ := strconv.ParseInt(tag, 10, 64)
+		limitInt := int(limit)
 
 		if fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface {
 			fv = fv.Elem()
@@ -56,29 +62,33 @@ func (m Marshaler) marshal(v reflect.Value) ([]rune, error) {
 
 		var runes []rune
 		if fv.Kind() == reflect.Struct {
-			d, err := m.marshal(fv)
+			startOffset := len(m.r) - 1
+			err := m.marshal(fv)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
-			runes = truncateRunes(limit, d)
+			endOffset := len(m.r) - 1
+			if limitInt > 0 && endOffset-startOffset > limitInt {
+				// truncate redundant runes
+				m.r = m.r[:startOffset+limitInt+1]
+			}
 		} else {
 			runes = extractRunes(fv)
-			runes = truncateRunes(limit, runes)
+			runes = truncateRunes(limitInt, runes)
+			m.r = append(m.r, runes...)
 		}
-
-		data = append(data, runes...)
 	}
 
-	return data, nil
+	return nil
 }
 
-func truncateRunes(limit int64, runes []rune) []rune {
+func truncateRunes(limit int, runes []rune) []rune {
 	if limit == 0 {
 		return runes
 	}
 
-	padding := int(limit) - len(runes)
+	padding := limit - len(runes)
 	if padding < 0 {
 		runes = runes[0:limit]
 	} else {
