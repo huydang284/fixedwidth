@@ -46,6 +46,7 @@ var s = mixedStructForUnmarshal{
 }
 
 func BenchmarkMarshal(b *testing.B) {
+	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		Marshal(s)
 	}
