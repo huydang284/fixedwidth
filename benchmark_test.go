@@ -53,19 +53,19 @@ func BenchmarkMarshal(b *testing.B) {
 }
 
 type mixedData struct {
-	F1  string   `fixed:"1,10"`
-	F2  *string  `fixed:"11,20"`
-	F3  int64    `fixed:"21,30"`
-	F4  *int64   `fixed:"31,40"`
-	F5  int32    `fixed:"41,50"`
-	F6  *int32   `fixed:"51,60"`
-	F7  int16    `fixed:"61,70"`
-	F8  *int16   `fixed:"71,80"`
-	F9  int8     `fixed:"81,90"`
-	F10 *int8    `fixed:"91,100"`
-	F11 float64  `fixed:"101,110"`
-	F12 *float64 `fixed:"111,120"`
-	F13 float32  `fixed:"121,130"`
+	F1  string   `fixed:"10"`
+	F2  *string  `fixed:"10"`
+	F3  int64    `fixed:"10"`
+	F4  *int64   `fixed:"10"`
+	F5  int32    `fixed:"10"`
+	F6  *int32   `fixed:"10"`
+	F7  int16    `fixed:"10"`
+	F8  *int16   `fixed:"10"`
+	F9  int8     `fixed:"10"`
+	F10 *int8    `fixed:"10"`
+	F11 float64  `fixed:"10"`
+	F12 *float64 `fixed:"10"`
+	F13 float32  `fixed:"10"`
 }
 
 var mixedDataInstance = mixedData{"foo", stringp("foo"), 42, int64p(42), 42, int32p(42), 42, int16p(42), 42, int8p(42), 4.2, float64p(4.2), 4.2} //,float32p(4.2)}

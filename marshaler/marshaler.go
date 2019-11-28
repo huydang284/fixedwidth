@@ -52,8 +52,13 @@ func (m *Marshaler) marshal(v reflect.Value) error {
 	vType := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		fv := v.Field(i)
+
+		var limit int64
 		tag := vType.Field(i).Tag.Get("fixed")
-		limit, _ := strconv.ParseInt(tag, 10, 64)
+		if tag != "" {
+			limit, _ = strconv.ParseInt(tag, 10, 64)
+		}
+
 		limitInt := int(limit)
 
 		if fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface {
