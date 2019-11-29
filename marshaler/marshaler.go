@@ -118,7 +118,7 @@ func (m *Marshaler) appendExtractedScalarValue(v reflect.Value) {
 	case reflect.Float64:
 		m.b = strconv.AppendFloat(m.b, v.Float(), 'f', 2, 64)
 	case reflect.String:
-		m.b = append(m.b, []byte(v.String())...)
+		m.b = append(m.b, v.String()...)
 	}
 
 	return
