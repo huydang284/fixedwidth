@@ -1,7 +1,6 @@
 package marshaler
 
 import (
-	"bytes"
 	"reflect"
 	"strconv"
 	"unicode/utf8"
@@ -102,8 +101,9 @@ func (m *Marshaler) truncateOrAddPadding(limit, start int) {
 		return
 	}
 
-	paddingBytes := bytes.Repeat([]byte(" "), padding)
-	m.b = append(m.b, paddingBytes...)
+	for i := 0; i < padding; i++ {
+		m.b = append(m.b, []byte{32}...)
+	}
 	return
 }
 
