@@ -3,18 +3,23 @@ package marshaler
 import (
 	"reflect"
 	"strconv"
+	"sync"
 	"unicode/utf8"
 )
 
 type Marshaler struct {
-	b []byte
+	mux sync.Mutex
+	b   []byte
 }
 
-func New() Marshaler {
-	return Marshaler{}
+func New() *Marshaler {
+	return &Marshaler{}
 }
 
 func (m *Marshaler) Marshal(i interface{}) ([]byte, error) {
+	m.mux.Lock()
+	defer m.mux.Unlock()
+
 	m.reset()
 	err := m.marshal(reflect.ValueOf(i))
 	return m.b, err

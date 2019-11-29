@@ -5,14 +5,8 @@ import (
 	"github.com/huydang284/fixedwidth/unmarshaler"
 )
 
-var m *marshaler.Marshaler
-
 func Marshal(v interface{}) ([]byte, error) {
-	if m == nil {
-		newMarshaler := marshaler.New()
-		m = &newMarshaler
-	}
-	return m.Marshal(v)
+	return marshaler.New().Marshal(v)
 }
 
 func Unmarshal(data []rune, v interface{}) error {
