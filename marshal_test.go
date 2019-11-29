@@ -73,43 +73,43 @@ func TestMarshal(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []rune
+		want    []byte
 		wantErr bool
 	}{
 		{
 			name:    "single line",
 			args:    args{v: singleLine},
-			want:    []rune(wantedSingleLine),
+			want:    []byte(wantedSingleLine),
 			wantErr: false,
 		},
 		{
 			name:    "multi lines",
 			args:    args{v: multiLines},
-			want:    []rune(wantedMultiLines),
+			want:    []byte(wantedMultiLines),
 			wantErr: false,
 		},
 		{
 			name:    "single line - unicode",
 			args:    args{v: singleLineUnicode},
-			want:    []rune(wantedSingleLineUnicode),
+			want:    []byte(wantedSingleLineUnicode),
 			wantErr: false,
 		},
 		{
 			name:    "multi lines - unicode",
 			args:    args{v: multiLinesUnicode},
-			want:    []rune(wantedMultiLinesUnicode),
+			want:    []byte(wantedMultiLinesUnicode),
 			wantErr: false,
 		},
 		{
 			name:    "nested struct with tag",
 			args:    args{v: nestedStructWithTag{Cat: cat{Name: "June", Gender: "male"}}},
-			want:    []rune("June      mal"),
+			want:    []byte("June      mal"),
 			wantErr: false,
 		},
 		{
 			name:    "nested struct without tag",
 			args:    args{v: nestedStructWithoutTag{Cat: cat{Name: "June", Gender: "male"}}},
-			want:    []rune("June      male  "),
+			want:    []byte("June      male  "),
 			wantErr: false,
 		},
 		{
@@ -123,7 +123,7 @@ func TestMarshal(t *testing.T) {
 					Job:       "Retired",
 				},
 			}},
-			want:    []rune("15 Drogba    Didier    41  Retired "),
+			want:    []byte("15 Drogba    Didier    41  Retired "),
 			wantErr: false,
 		},
 		{
@@ -137,7 +137,7 @@ func TestMarshal(t *testing.T) {
 					Job:       "Retired",
 				},
 			}},
-			want:    []rune("15 Drogba    Didie"),
+			want:    []byte("15 Drogba    Didie"),
 			wantErr: false,
 		},
 		{
@@ -183,13 +183,13 @@ func TestMarshal(t *testing.T) {
 				F28: float32p(1.12),
 				F29: 2.23,
 			}},
-			want:    []rune("the fsecP         female10.57.22what i7       Ali       wow       male  1  2  3  4  5  6  7  8  9  1  2  3  4  5  6  7  8  9  10 1.12 2.23   "),
+			want:    []byte("the fsecP         female10.57.22what i7       Ali       wow       male  1  2  3  4  5  6  7  8  9  1  2  3  4  5  6  7  8  9  10 1.12 2.23   "),
 			wantErr: false,
 		},
 		{
 			name:    "empty struct - single line",
 			args:    args{v: person{}},
-			want:    []rune("                    0           "),
+			want:    []byte("                    0           "),
 			wantErr: false,
 		},
 	}
@@ -201,7 +201,7 @@ func TestMarshal(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Marshal() got = %v, want %v", got, tt.want)
+				t.Errorf("Marshal() got = %v, want %v \n %s, %s", got, tt.want, string(got), string(tt.want))
 			}
 		})
 	}

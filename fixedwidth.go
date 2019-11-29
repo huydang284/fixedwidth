@@ -7,7 +7,7 @@ import (
 
 var m *marshaler.Marshaler
 
-func Marshal(v interface{}) ([]rune, error) {
+func Marshal(v interface{}) ([]byte, error) {
 	if m == nil {
 		newMarshaler := marshaler.New()
 		m = &newMarshaler
