@@ -66,8 +66,6 @@ func (m *Marshaler) marshal(v reflect.Value) error {
 			fv = fv.Elem()
 		}
 
-		var data []byte
-
 		startOffset := len(m.b)
 		if fv.Kind() == reflect.Struct {
 			err := m.marshal(fv)
@@ -75,20 +73,18 @@ func (m *Marshaler) marshal(v reflect.Value) error {
 				return err
 			}
 		} else {
-			data = extractRunes(fv)
-			m.b = append(m.b, data...)
+			m.appendExtractedScalarValue(fv)
 		}
 
 		if limitInt > 0 {
-			// truncate redundant runes
-			m.truncate(limitInt, startOffset)
+			m.truncateOrAddPadding(limitInt, startOffset)
 		}
 	}
 
 	return nil
 }
 
-func (m *Marshaler) truncate(limit, start int) {
+func (m *Marshaler) truncateOrAddPadding(limit, start int) {
 	if limit == 0 {
 		return
 	}
@@ -111,6 +107,23 @@ func (m *Marshaler) truncate(limit, start int) {
 	return
 }
 
+func (m *Marshaler) appendExtractedScalarValue(v reflect.Value) {
+	switch v.Kind() {
+	case reflect.Int, reflect.Int64, reflect.Int32, reflect.Int16, reflect.Int8:
+		m.b = strconv.AppendInt(m.b, v.Int(), 10)
+	case reflect.Uint, reflect.Uint64, reflect.Uint32, reflect.Uint16, reflect.Uint8:
+		m.b = strconv.AppendUint(m.b, v.Uint(), 10)
+	case reflect.Float32:
+		m.b = strconv.AppendFloat(m.b, v.Float(), 'f', 2, 32)
+	case reflect.Float64:
+		m.b = strconv.AppendFloat(m.b, v.Float(), 'f', 2, 64)
+	case reflect.String:
+		m.b = append(m.b, []byte(v.String())...)
+	}
+
+	return
+}
+
 func getFirstInvalidRune(limit int, b []byte) int {
 	i := 1
 	for limit > 0 {
@@ -119,21 +132,4 @@ func getFirstInvalidRune(limit int, b []byte) int {
 		limit--
 	}
 	return i
-}
-
-func extractRunes(v reflect.Value) []byte {
-	switch v.Kind() {
-	case reflect.Int, reflect.Int64, reflect.Int32, reflect.Int16, reflect.Int8:
-		return []byte(strconv.Itoa(int(v.Int())))
-	case reflect.Uint, reflect.Uint64, reflect.Uint32, reflect.Uint16, reflect.Uint8:
-		return []byte(strconv.FormatUint(v.Uint(), 10))
-	case reflect.Float32:
-		return []byte(strconv.FormatFloat(v.Float(), 'f', 2, 32))
-	case reflect.Float64:
-		return []byte(strconv.FormatFloat(v.Float(), 'f', 2, 64))
-	case reflect.String:
-		return []byte(v.String())
-	}
-
-	return nil
 }
