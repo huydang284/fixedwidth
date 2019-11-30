@@ -1,4 +1,4 @@
-package marshaler
+package fixedwidth
 
 import (
 	"reflect"
@@ -12,7 +12,7 @@ type Marshaler struct {
 	b   []byte
 }
 
-func New() *Marshaler {
+func NewMarshaler() *Marshaler {
 	return &Marshaler{}
 }
 

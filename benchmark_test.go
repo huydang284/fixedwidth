@@ -1,7 +1,6 @@
 package fixedwidth
 
 import (
-	"github.com/huydang284/fixedwidth/marshaler"
 	"testing"
 )
 
@@ -78,7 +77,7 @@ func BenchmarkMarshal_MixedData_1000(b *testing.B) {
 	for i := range v {
 		v[i] = mixedDataInstance
 	}
-	m := marshaler.New()
+	m := NewMarshaler()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		m.Marshal(v)

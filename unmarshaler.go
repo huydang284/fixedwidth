@@ -1,4 +1,4 @@
-package unmarshaler
+package fixedwidth
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 
 type Unmarshaler struct{}
 
-func New() Unmarshaler {
+func NewUnmarshaler() Unmarshaler {
 	return Unmarshaler{}
 }
 
