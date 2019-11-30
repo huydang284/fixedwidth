@@ -54,7 +54,7 @@ func TestUnmarshal(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var p []person
-			err := Unmarshal([]rune(tt.data), &p)
+			err := Unmarshal([]byte(tt.data), &p)
 			if err != nil {
 				t.Error(err)
 				return
@@ -69,7 +69,7 @@ func TestUnmarshal(t *testing.T) {
 	t.Run("nested struct with tag", func(t *testing.T) {
 		want := nestedStructWithTag{Cat: cat{Name: "June", Gender: "mal"}}
 		var s nestedStructWithTag
-		err := Unmarshal([]rune("June      mal"), &s)
+		err := Unmarshal([]byte("June      mal"), &s)
 		if err != nil {
 			t.Error(err)
 			return
@@ -83,7 +83,7 @@ func TestUnmarshal(t *testing.T) {
 	t.Run("nested struct without tag", func(t *testing.T) {
 		want := nestedStructWithoutTag{Cat: cat{Name: "June", Gender: "male"}}
 		var s nestedStructWithoutTag
-		err := Unmarshal([]rune("June      male  "), &s)
+		err := Unmarshal([]byte("June      male  "), &s)
 		if err != nil {
 			t.Error(err)
 			return
@@ -105,7 +105,7 @@ func TestUnmarshal(t *testing.T) {
 			},
 		}
 		var s embededStructWithTag
-		err := Unmarshal([]rune("15 Drogba    Didie"), &s)
+		err := Unmarshal([]byte("15 Drogba    Didie"), &s)
 		if err != nil {
 			t.Error(err)
 			return
@@ -127,7 +127,7 @@ func TestUnmarshal(t *testing.T) {
 			},
 		}
 		var s embededStruct
-		err := Unmarshal([]rune("15 Drogba    Didier    41  Retired "), &s)
+		err := Unmarshal([]byte("15 Drogba    Didier    41  Retired "), &s)
 		if err != nil {
 			t.Error(err)
 			return
@@ -182,7 +182,7 @@ func TestUnmarshal(t *testing.T) {
 			F30: stringp(""),
 		}
 		var s mixedStruct
-		err := Unmarshal([]rune("the fsecP         female10.57.22what i7       Ali       wow       male  1  2  3  4  5  6  7  8  9  1  2  3  4  5  6  7  8  9  10 1.12 2.23   "), &s)
+		err := Unmarshal([]byte("the fsecP         female10.57.22what i7       Ali       wow       male  1  2  3  4  5  6  7  8  9  1  2  3  4  5  6  7  8  9  10 1.12 2.23   "), &s)
 		if err != nil {
 			t.Error(err)
 			return
