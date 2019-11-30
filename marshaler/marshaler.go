@@ -1,27 +1,32 @@
 package marshaler
 
 import (
-	"bytes"
 	"reflect"
 	"strconv"
+	"sync"
+	"unicode/utf8"
 )
 
 type Marshaler struct {
-	r []rune
+	mux sync.Mutex
+	b   []byte
 }
 
-func New() Marshaler {
-	return Marshaler{}
+func New() *Marshaler {
+	return &Marshaler{}
 }
 
-func (m *Marshaler) Marshal(i interface{}) ([]rune, error) {
+func (m *Marshaler) Marshal(i interface{}) ([]byte, error) {
+	m.mux.Lock()
+	defer m.mux.Unlock()
+
 	m.reset()
 	err := m.marshal(reflect.ValueOf(i))
-	return m.r, err
+	return m.b, err
 }
 
 func (m *Marshaler) reset() {
-	m.r = m.r[:0]
+	m.b = m.b[:0]
 }
 
 func (m *Marshaler) marshal(v reflect.Value) error {
@@ -35,7 +40,7 @@ func (m *Marshaler) marshal(v reflect.Value) error {
 			}
 
 			if i != vLen-1 {
-				m.r = append(m.r, '\n')
+				m.b = append(m.b, '\n')
 			}
 		}
 		return nil
@@ -65,57 +70,71 @@ func (m *Marshaler) marshal(v reflect.Value) error {
 			fv = fv.Elem()
 		}
 
-		var runes []rune
+		startOffset := len(m.b)
 		if fv.Kind() == reflect.Struct {
-			startOffset := len(m.r) - 1
 			err := m.marshal(fv)
 			if err != nil {
 				return err
 			}
-
-			endOffset := len(m.r) - 1
-			if limitInt > 0 && endOffset-startOffset > limitInt {
-				// truncate redundant runes
-				m.r = m.r[:startOffset+limitInt+1]
-			}
 		} else {
-			runes = extractRunes(fv)
-			runes = truncateRunes(limitInt, runes)
-			m.r = append(m.r, runes...)
+			m.appendExtractedScalarValue(fv)
+		}
+
+		if limitInt > 0 {
+			m.truncateOrAddPadding(limitInt, startOffset)
 		}
 	}
 
 	return nil
 }
 
-func truncateRunes(limit int, runes []rune) []rune {
+func (m *Marshaler) truncateOrAddPadding(limit, start int) {
 	if limit == 0 {
-		return runes
+		return
 	}
 
-	padding := limit - len(runes)
-	if padding < 0 {
-		runes = runes[0:limit]
-	} else {
-		paddingRunes := bytes.Runes(bytes.Repeat([]byte(" "), padding))
-		runes = append(runes, paddingRunes...)
+	b := m.b[start:]
+	totalRunes := utf8.RuneCount(b)
+	padding := limit - totalRunes
+	if padding == 0 {
+		return
 	}
-	return runes
+
+	if padding < 0 {
+		// exclude redundant bytes
+		m.b = m.b[:start+getFirstInvalidRune(limit, b)-1]
+		return
+	}
+
+	for i := 0; i < padding; i++ {
+		m.b = append(m.b, []byte{32}...)
+	}
+	return
 }
 
-func extractRunes(v reflect.Value) []rune {
+func (m *Marshaler) appendExtractedScalarValue(v reflect.Value) {
 	switch v.Kind() {
 	case reflect.Int, reflect.Int64, reflect.Int32, reflect.Int16, reflect.Int8:
-		return []rune(strconv.Itoa(int(v.Int())))
+		m.b = strconv.AppendInt(m.b, v.Int(), 10)
 	case reflect.Uint, reflect.Uint64, reflect.Uint32, reflect.Uint16, reflect.Uint8:
-		return []rune(strconv.FormatUint(v.Uint(), 10))
+		m.b = strconv.AppendUint(m.b, v.Uint(), 10)
 	case reflect.Float32:
-		return []rune(strconv.FormatFloat(v.Float(), 'f', 2, 32))
+		m.b = strconv.AppendFloat(m.b, v.Float(), 'f', 2, 32)
 	case reflect.Float64:
-		return []rune(strconv.FormatFloat(v.Float(), 'f', 2, 64))
+		m.b = strconv.AppendFloat(m.b, v.Float(), 'f', 2, 64)
 	case reflect.String:
-		return []rune(v.String())
+		m.b = append(m.b, v.String()...)
 	}
 
-	return nil
+	return
+}
+
+func getFirstInvalidRune(limit int, b []byte) int {
+	i := 1
+	for limit > 0 {
+		_, s := utf8.DecodeRune(b)
+		i += s
+		limit--
+	}
+	return i
 }

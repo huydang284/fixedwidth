@@ -1,6 +1,9 @@
 package fixedwidth
 
-import "testing"
+import (
+	"github.com/huydang284/fixedwidth/marshaler"
+	"testing"
+)
 
 var s = mixedStructForUnmarshal{
 	F1: "the f",
@@ -75,8 +78,9 @@ func BenchmarkMarshal_MixedData_1000(b *testing.B) {
 	for i := range v {
 		v[i] = mixedDataInstance
 	}
+	m := marshaler.New()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		Marshal(v)
+		m.Marshal(v)
 	}
 }
