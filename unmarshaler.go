@@ -5,9 +5,12 @@ import (
 	"errors"
 	"reflect"
 	"strconv"
+	"unicode/utf8"
 )
 
-type Unmarshaler struct{}
+type Unmarshaler struct {
+	tag
+}
 
 func NewUnmarshaler() Unmarshaler {
 	return Unmarshaler{}
@@ -43,38 +46,34 @@ func (m Unmarshaler) unmarshal(data []byte, modelValue reflect.Value, modelType 
 	return 0, nil
 }
 
-func (m Unmarshaler) unmarshalStruct(data []byte, modelValue reflect.Value) (int, error) {
-	modelType := modelValue.Type()
-	if modelType.Kind() != reflect.Struct {
-		return 0, errors.New("invalid type")
+func (m Unmarshaler) unmarshalStruct(data []byte, structValue reflect.Value) (int, error) {
+	structType := structValue.Type()
+	if structType.Kind() != reflect.Struct {
+		return 0, errors.New("input value is not a struct")
 	}
 
 	index := 0
-	for i := 0; i < modelValue.NumField(); i++ {
-		if index >= len(data) {
+	dataLen := len(data)
+	for i := 0; i < structValue.NumField(); i++ {
+		if index >= dataLen {
 			break
 		}
 
-		fieldType := modelType.Field(i)
-		fieldValue := modelValue.Field(i)
-		tag := fieldType.Tag.Get("fixed")
-		l, _ := strconv.ParseInt(tag, 10, 64)
-		limit := int(l)
-		if limit == 0 && !isStructOrStructPointer(fieldType.Type) {
+		structField := structType.Field(i)
+		fieldValue := structValue.Field(i)
+		limit := m.getLimitFixedTag(structField)
+
+		if limit == 0 && !isStructOrStructPointer(structField.Type) {
 			continue
 		}
 
-		var err error
 		var uLen int
-		if limit == 0 && isStructOrStructPointer(fieldType.Type) {
-			uLen, err = m.unmarshal(data[index:], fieldValue, fieldType.Type)
+		var err error
+		if limit == 0 && isStructOrStructPointer(structField.Type) {
+			uLen, err = m.unmarshal(data[index:], fieldValue, structField.Type)
 		} else {
-			pivot := index + limit
-			if pivot > len(data) {
-				pivot = len(data)
-			}
-
-			uLen, err = m.unmarshal(data[index:pivot], fieldValue, fieldType.Type)
+			upperBound := getUpperBound(index, limit, data)
+			uLen, err = m.unmarshal(data[index:upperBound], fieldValue, structField.Type)
 		}
 
 		if err != nil {
@@ -191,4 +190,22 @@ func isStructOrStructPointer(t reflect.Type) bool {
 	}
 
 	return false
+}
+
+func getUpperBound(lowerBound, limit int, data []byte) int {
+	diff := 0
+	lenData := len(data)
+	data = data[lowerBound:]
+	for limit > 0 {
+		_, s := utf8.DecodeRune(data)
+		diff += s
+		limit--
+		data = data[s:]
+	}
+	upperBound := lowerBound + diff
+	if upperBound > lenData {
+		upperBound = lenData
+	}
+
+	return upperBound
 }
