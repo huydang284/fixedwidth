@@ -1,10 +1,10 @@
 package unmarshaler
 
 import (
+	"bytes"
 	"errors"
 	"reflect"
 	"strconv"
-	"strings"
 )
 
 type Unmarshaler struct{}
@@ -13,7 +13,7 @@ func New() Unmarshaler {
 	return Unmarshaler{}
 }
 
-func (m Unmarshaler) Unmarshal(data []rune, model interface{}) error {
+func (m Unmarshaler) Unmarshal(data []byte, model interface{}) error {
 	modelType := reflect.TypeOf(model)
 
 	if modelType.Kind() != reflect.Ptr {
@@ -24,7 +24,7 @@ func (m Unmarshaler) Unmarshal(data []rune, model interface{}) error {
 	return err
 }
 
-func (m Unmarshaler) unmarshal(data []rune, modelValue reflect.Value, modelType reflect.Type) (int, error) {
+func (m Unmarshaler) unmarshal(data []byte, modelValue reflect.Value, modelType reflect.Type) (int, error) {
 	if isBasicType(modelType.Kind()) {
 		return m.unmarshalBasicType(data, modelValue)
 	}
@@ -43,7 +43,7 @@ func (m Unmarshaler) unmarshal(data []rune, modelValue reflect.Value, modelType 
 	return 0, nil
 }
 
-func (m Unmarshaler) unmarshalStruct(data []rune, modelValue reflect.Value) (int, error) {
+func (m Unmarshaler) unmarshalStruct(data []byte, modelValue reflect.Value) (int, error) {
 	modelType := modelValue.Type()
 	if modelType.Kind() != reflect.Struct {
 		return 0, errors.New("invalid type")
@@ -87,7 +87,7 @@ func (m Unmarshaler) unmarshalStruct(data []rune, modelValue reflect.Value) (int
 	return index, nil
 }
 
-func (m Unmarshaler) unmarshalBasicType(data []rune, modelValue reflect.Value) (int, error) {
+func (m Unmarshaler) unmarshalBasicType(data []byte, modelValue reflect.Value) (int, error) {
 	l := len(data)
 	data = removePadding(data)
 	modelType := modelValue.Type()
@@ -118,7 +118,7 @@ func (m Unmarshaler) unmarshalBasicType(data []rune, modelValue reflect.Value) (
 	return l, nil
 }
 
-func (m Unmarshaler) unmarshalPointer(data []rune, modelValue reflect.Value, modelType reflect.Type) (int, error) {
+func (m Unmarshaler) unmarshalPointer(data []byte, modelValue reflect.Value, modelType reflect.Type) (int, error) {
 	if modelType.Kind() != reflect.Ptr {
 		return 0, errors.New("invalid type")
 	}
@@ -133,12 +133,12 @@ func (m Unmarshaler) unmarshalPointer(data []rune, modelValue reflect.Value, mod
 	return l, nil
 }
 
-func (m Unmarshaler) unmarshalSlice(data []rune, modelValue reflect.Value) (int, error) {
+func (m Unmarshaler) unmarshalSlice(data []byte, modelValue reflect.Value) (int, error) {
 	modelType := modelValue.Type()
-	lines := strings.Split(string(data), "\n")
+	lines := bytes.Split(data, []byte("\n"))
 	for _, line := range lines {
 		newElem := reflect.New(modelType.Elem()).Elem()
-		_, err := m.unmarshal([]rune(line), newElem, modelType.Elem())
+		_, err := m.unmarshal(line, newElem, modelType.Elem())
 		if err != nil {
 			return 0, err
 		}
@@ -148,7 +148,7 @@ func (m Unmarshaler) unmarshalSlice(data []rune, modelValue reflect.Value) (int,
 	return len(data), nil
 }
 
-func (m Unmarshaler) unmarshalInterface(data []rune, modelValue reflect.Value) (int, error) {
+func (m Unmarshaler) unmarshalInterface(data []byte, modelValue reflect.Value) (int, error) {
 	var tempString string
 	newType := reflect.TypeOf(tempString)
 	newValue := reflect.New(newType)
@@ -160,9 +160,8 @@ func (m Unmarshaler) unmarshalInterface(data []rune, modelValue reflect.Value) (
 	return l, nil
 }
 
-// todo check this performance
-func removePadding(data []rune) []rune {
-	return []rune(strings.Trim(string(data), " "))
+func removePadding(data []byte) []byte {
+	return bytes.Trim(data, " ")
 }
 
 func isBasicType(p reflect.Kind) bool {
