@@ -89,6 +89,10 @@ func (m Unmarshaler) unmarshalStruct(data []byte, structValue reflect.Value) (in
 func (m Unmarshaler) unmarshalBasicType(data []byte, modelValue reflect.Value) (int, error) {
 	l := len(data)
 	data = removePadding(data)
+	if len(data) == 0 {
+		return l, nil
+	}
+
 	modelType := modelValue.Type()
 
 	switch modelType.Kind() {
