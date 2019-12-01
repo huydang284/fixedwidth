@@ -10,6 +10,7 @@ import (
 type Marshaler struct {
 	mux sync.Mutex
 	b   []byte
+	tag
 }
 
 func NewMarshaler() *Marshaler {
@@ -57,14 +58,7 @@ func (m *Marshaler) marshal(v reflect.Value) error {
 	vType := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		fv := v.Field(i)
-
-		var limit int64
-		tag := vType.Field(i).Tag.Get("fixed")
-		if tag != "" {
-			limit, _ = strconv.ParseInt(tag, 10, 64)
-		}
-
-		limitInt := int(limit)
+		limitInt := m.getLimitFixedTag(vType.Field(i))
 
 		if fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface {
 			fv = fv.Elem()
