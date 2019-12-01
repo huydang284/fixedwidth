@@ -160,7 +160,18 @@ func (m Unmarshaler) unmarshalInterface(data []byte, modelValue reflect.Value) (
 }
 
 func removePadding(data []byte) []byte {
-	return bytes.Trim(data, " ")
+	if len(data) == 0 {
+		return data
+	}
+
+	i := len(data) - 1
+	for ; i >= 0; i-- {
+		if data[i] == byte(32) {
+			continue
+		}
+		break
+	}
+	return data[:i+1]
 }
 
 func isBasicType(p reflect.Kind) bool {

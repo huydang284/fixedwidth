@@ -83,3 +83,11 @@ func BenchmarkMarshal_MixedData_1000(b *testing.B) {
 		m.Marshal(v)
 	}
 }
+
+func BenchmarkUnmarshal(b *testing.B) {
+	var mixed mixedStructForUnmarshal
+	data := []byte("the fsecP         female10.57.22what i7       Ali       wow       male  1  2  3  4  5  6  7  8  9  1  2  3  4  5  6  7  8  9  10 1.12 2.23   ")
+	for i := 0; i < b.N; i++ {
+		Unmarshal(data, &mixed)
+	}
+}
