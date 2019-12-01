@@ -68,14 +68,15 @@ func (m Unmarshaler) unmarshalStruct(data []byte, structValue reflect.Value) (in
 		}
 
 		var uLen int
-		var err error
+		var dataChunk []byte
 		if limit == 0 && isStructOrStructPointer(structField.Type) {
-			uLen, err = m.unmarshal(data[index:], fieldValue, structField.Type)
+			dataChunk = data[index:]
 		} else {
 			upperBound := getUpperBound(index, limit, data)
-			uLen, err = m.unmarshal(data[index:upperBound], fieldValue, structField.Type)
+			dataChunk = data[index:upperBound]
 		}
 
+		uLen, err := m.unmarshal(dataChunk, fieldValue, structField.Type)
 		if err != nil {
 			return 0, err
 		}
