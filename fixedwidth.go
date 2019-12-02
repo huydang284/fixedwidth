@@ -1,5 +1,7 @@
 package fixedwidth
 
+const spaceByte = byte(' ')
+
 func Marshal(v interface{}) ([]byte, error) {
 	return NewMarshaler().Marshal(v)
 }

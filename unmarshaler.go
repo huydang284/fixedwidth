@@ -171,7 +171,7 @@ func removePadding(data []byte) []byte {
 
 	i := len(data) - 1
 	for ; i >= 0; i-- {
-		if data[i] == byte(32) {
+		if data[i] == spaceByte {
 			continue
 		}
 		break

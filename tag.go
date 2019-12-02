@@ -9,6 +9,7 @@ const tagName = "fixed"
 
 type tag struct{}
 
+// getLimitFixedTag get the tag `fixed` of a struct field then convert to integer
 func (tag) getLimitFixedTag(field reflect.StructField) int {
 	t := field.Tag.Get(tagName)
 	if t == "" {

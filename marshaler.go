@@ -8,8 +8,13 @@ import (
 )
 
 type Marshaler struct {
+	// mux is used to prevent other goroutines using the same Marshaler
 	mux sync.Mutex
-	b   []byte
+
+	// b is an underlying slice of bytes of a Marshaler.
+	// After each marshal, b is reused via reset method.
+	// By reusing b, we can minimize number of allocations
+	b []byte
 	tag
 }
 
@@ -26,6 +31,7 @@ func (m *Marshaler) Marshal(i interface{}) ([]byte, error) {
 	return m.b, err
 }
 
+// reset the underlying slice, reuse memory allocation
 func (m *Marshaler) reset() {
 	m.b = m.b[:0]
 }
@@ -82,30 +88,6 @@ func (m *Marshaler) marshal(v reflect.Value) error {
 	return nil
 }
 
-func (m *Marshaler) truncateOrAddPadding(limit, start int) {
-	if limit == 0 {
-		return
-	}
-
-	b := m.b[start:]
-	totalRunes := utf8.RuneCount(b)
-	padding := limit - totalRunes
-	if padding == 0 {
-		return
-	}
-
-	if padding < 0 {
-		// exclude redundant bytes
-		m.b = m.b[:start+getFirstInvalidRune(limit, b)-1]
-		return
-	}
-
-	for i := 0; i < padding; i++ {
-		m.b = append(m.b, []byte{32}...)
-	}
-	return
-}
-
 func (m *Marshaler) appendExtractedScalarValue(v reflect.Value) {
 	switch v.Kind() {
 	case reflect.Int, reflect.Int64, reflect.Int32, reflect.Int16, reflect.Int8:
@@ -123,12 +105,36 @@ func (m *Marshaler) appendExtractedScalarValue(v reflect.Value) {
 	return
 }
 
-func getFirstInvalidRune(limit int, b []byte) int {
+func (m *Marshaler) truncateOrAddPadding(limit, lowerBound int) {
+	if limit == 0 {
+		return
+	}
+
+	b := m.b[lowerBound:]
+	totalRunes := utf8.RuneCount(b)
+	padding := limit - totalRunes
+	if padding == 0 {
+		return
+	}
+
+	if padding < 0 {
+		// exclude redundant bytes
+		m.b = m.b[:lowerBound+getFirstInvalidRune(limit, b)-1]
+		return
+	}
+
+	for i := 0; i < padding; i++ {
+		m.b = append(m.b, spaceByte)
+	}
+	return
+}
+
+func getFirstInvalidRune(noRunes int, b []byte) int {
 	i := 1
-	for limit > 0 {
+	for noRunes > 0 {
 		_, s := utf8.DecodeRune(b)
 		i += s
-		limit--
+		noRunes--
 	}
 	return i
 }
