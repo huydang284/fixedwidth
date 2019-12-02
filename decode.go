@@ -16,6 +16,8 @@ func NewUnmarshaler() Unmarshaler {
 	return Unmarshaler{}
 }
 
+// Unmarshal decodes fixed-width encoding data to model,
+// model is required to be a pointer.
 func (m Unmarshaler) Unmarshal(data []byte, model interface{}) error {
 	modelType := reflect.TypeOf(model)
 

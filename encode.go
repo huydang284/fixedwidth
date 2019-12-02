@@ -141,6 +141,7 @@ func (m *Marshaler) truncateOrAddPadding(limit, lowerBound int) {
 		return
 	}
 
+	// append additional spaces
 	for i := 0; i < padding; i++ {
 		m.b = append(m.b, spaceByte)
 	}
