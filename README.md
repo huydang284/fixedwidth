@@ -3,6 +3,9 @@
 
 Fixedwidth is a Go package that provides a simple way to define fixed-width data, fast encoding and decoding also is the project's target.
 
+## Character encoding supported
+UTF-8
+
 ## Getting Started
 ### Installation
 To start using Fixedwidth, run `go get`:
