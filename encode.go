@@ -8,7 +8,7 @@ import (
 	"unicode/utf8"
 )
 
-// Unmarshaler is the place fixed-width encoding happen
+// Marshaler is the place fixed-width encoding happen
 type Marshaler struct {
 	// mux is used to prevent other goroutines using the same Marshaler
 	mux sync.Mutex
@@ -20,7 +20,7 @@ type Marshaler struct {
 	tag
 }
 
-// NewUnmarshaler create new Marshaler
+// NewMarshaler create new Marshaler
 // When creating new Marshaler, you should consider b field
 func NewMarshaler() *Marshaler {
 	return &Marshaler{}
