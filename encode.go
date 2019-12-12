@@ -1,12 +1,14 @@
 package fixedwidth
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"sync"
 	"unicode/utf8"
 )
 
+// Unmarshaler is the place fixed-width encoding happen
 type Marshaler struct {
 	// mux is used to prevent other goroutines using the same Marshaler
 	mux sync.Mutex
@@ -18,6 +20,8 @@ type Marshaler struct {
 	tag
 }
 
+// NewUnmarshaler create new Marshaler
+// When creating new Marshaler, you should consider b field
 func NewMarshaler() *Marshaler {
 	return &Marshaler{}
 }
@@ -28,18 +32,8 @@ func NewMarshaler() *Marshaler {
 //
 // Each field in a struct need to be defined a `fixed` tag.
 // The `fixed` tag indicates the maximum width of current field.
-// Example:
-// type foo struct {
-//     bar string `fixed:"5"`
-// }
-// // value longer than `fixed` tag
-// a := foo{bar: "longerthan5"}
-// m.Marshal(a) // will returned []byte("longe") - remain characters are truncated.
-// // value shorter than `fixed` tag
-// b := foo{bar: "less"}
-// m.Marshal(b) // will returned []byte("less ") - a padding space added.
 //
-// If b is slice of struct, Marshal will return multi lines seperated by new line character (\n).
+// If v is slice of struct, Marshal will return multi lines separated by new line character (\n).
 func (m *Marshaler) Marshal(v interface{}) ([]byte, error) {
 	m.mux.Lock()
 	defer m.mux.Unlock()
@@ -82,7 +76,11 @@ func (m *Marshaler) marshal(v reflect.Value) error {
 	vType := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		fv := v.Field(i)
-		limit := m.getLimitFixedTag(vType.Field(i))
+		structField := vType.Field(i)
+		limit, ok := m.getLimitFixedTag(structField)
+		if !ok {
+			return fmt.Errorf("invalid fixed tag of field %s", structField.Name)
+		}
 
 		if fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface {
 			fv = fv.Elem()
