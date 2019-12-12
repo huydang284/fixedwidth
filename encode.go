@@ -1,6 +1,7 @@
 package fixedwidth
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"sync"
@@ -82,7 +83,11 @@ func (m *Marshaler) marshal(v reflect.Value) error {
 	vType := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		fv := v.Field(i)
-		limit := m.getLimitFixedTag(vType.Field(i))
+		structField := vType.Field(i)
+		limit, ok := m.getLimitFixedTag(structField)
+		if !ok {
+			return fmt.Errorf("invalid fixed tag of field %s", structField.Name)
+		}
 
 		if fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface {
 			fv = fv.Elem()

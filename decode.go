@@ -3,6 +3,7 @@ package fixedwidth
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"reflect"
 	"strconv"
 	"unicode/utf8"
@@ -63,7 +64,10 @@ func (m Unmarshaler) unmarshalStruct(data []byte, structValue reflect.Value) (in
 
 		structField := structType.Field(i)
 		fieldValue := structValue.Field(i)
-		limit := m.getLimitFixedTag(structField)
+		limit, ok := m.getLimitFixedTag(structField)
+		if !ok {
+			return 0, fmt.Errorf("invalid fixed tag of field %s", structField.Name)
+		}
 
 		if limit == 0 && !isStructOrStructPointer(structField.Type) {
 			continue
