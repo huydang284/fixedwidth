@@ -1,6 +1,7 @@
 # Fixedwidth
 [![Build Status](https://travis-ci.org/huydang284/fixedwidth.svg?branch=master)](https://travis-ci.org/huydang284/fixedwidth)
 [![Report](https://goreportcard.com/badge/github.com/huydang284/fixedwidth)](https://goreportcard.com/badge/github.com/huydang284/fixedwidth)
+[![Code coverage](https://codecov.io/gh/huydang284/fixedwidth/branch/master/graph/badge.svg)](https://codecov.io/gh/huydang284/fixedwidth)
 
 Fixedwidth is a Go package that provides a simple way to define fixed-width data, fast encoding and decoding also is the project's target.
 
