@@ -9,10 +9,12 @@ import (
 	"unicode/utf8"
 )
 
+// Unmarshaler is the place fixed-width decoding happen
 type Unmarshaler struct {
 	tag
 }
 
+// NewUnmarshaler create new Unmarshaler
 func NewUnmarshaler() Unmarshaler {
 	return Unmarshaler{}
 }

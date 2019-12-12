@@ -8,6 +8,7 @@ import (
 	"unicode/utf8"
 )
 
+// Unmarshaler is the place fixed-width encoding happen
 type Marshaler struct {
 	// mux is used to prevent other goroutines using the same Marshaler
 	mux sync.Mutex
@@ -19,6 +20,8 @@ type Marshaler struct {
 	tag
 }
 
+// NewUnmarshaler create new Marshaler
+// When creating new Marshaler, you should consider b field
 func NewMarshaler() *Marshaler {
 	return &Marshaler{}
 }
@@ -30,7 +33,7 @@ func NewMarshaler() *Marshaler {
 // Each field in a struct need to be defined a `fixed` tag.
 // The `fixed` tag indicates the maximum width of current field.
 //
-// If v is slice of struct, Marshal will return multi lines seperated by new line character (\n).
+// If v is slice of struct, Marshal will return multi lines separated by new line character (\n).
 func (m *Marshaler) Marshal(v interface{}) ([]byte, error) {
 	m.mux.Lock()
 	defer m.mux.Unlock()

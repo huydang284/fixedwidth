@@ -96,8 +96,8 @@ func TestUnmarshal(t *testing.T) {
 		}
 	})
 
-	t.Run("embeded struct with tag", func(t *testing.T) {
-		want := embededStructWithTag{
+	t.Run("embedded struct with tag", func(t *testing.T) {
+		want := embeddedStructWithTag{
 			Number: 15,
 			person: person{
 				FirstName: "Drogba",
@@ -106,7 +106,7 @@ func TestUnmarshal(t *testing.T) {
 				Job:       "",
 			},
 		}
-		var s embededStructWithTag
+		var s embeddedStructWithTag
 		err := Unmarshal([]byte("15 Drogba    Didie"), &s)
 		if err != nil {
 			t.Error(err)
@@ -118,8 +118,8 @@ func TestUnmarshal(t *testing.T) {
 		}
 	})
 
-	t.Run("embeded struct without tag", func(t *testing.T) {
-		want := embededStruct{
+	t.Run("embedded struct without tag", func(t *testing.T) {
+		want := embeddedStruct{
 			Number: 15,
 			person: person{
 				FirstName: "Drogba",
@@ -128,7 +128,7 @@ func TestUnmarshal(t *testing.T) {
 				Job:       "Retired",
 			},
 		}
-		var s embededStruct
+		var s embeddedStruct
 		err := Unmarshal([]byte("15 Drogba    Didier    41  Retired "), &s)
 		if err != nil {
 			t.Error(err)

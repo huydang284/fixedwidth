@@ -115,8 +115,8 @@ func TestMarshal(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "embeded struct without tag",
-			args: args{v: embededStruct{
+			name: "embedded struct without tag",
+			args: args{v: embeddedStruct{
 				Number: 15,
 				person: person{
 					FirstName: "Drogba",
@@ -129,8 +129,8 @@ func TestMarshal(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "embeded struct with tag",
-			args: args{v: embededStructWithTag{
+			name: "embedded struct with tag",
+			args: args{v: embeddedStructWithTag{
 				Number: 15,
 				person: person{
 					FirstName: "Drogba",

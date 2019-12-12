@@ -34,12 +34,12 @@ type cat struct {
 	Gender string `fixed:"6"`
 }
 
-type embededStruct struct {
+type embeddedStruct struct {
 	Number int `fixed:"3"`
 	person
 }
 
-type embededStructWithTag struct {
+type embeddedStructWithTag struct {
 	Number int `fixed:"3"`
 	person `fixed:"15"`
 }
