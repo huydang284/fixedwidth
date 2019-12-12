@@ -2,7 +2,9 @@ package fixedwidth
 
 import (
 	"errors"
+	"fmt"
 	"github.com/google/go-cmp/cmp"
+	"log"
 	"reflect"
 	"testing"
 )
@@ -313,4 +315,16 @@ func TestUnmarshal(t *testing.T) {
 			return
 		}
 	})
+}
+
+func ExampleUnmarshaler_Unmarshal() {
+	var p person
+	m := NewUnmarshaler()
+	err := m.Unmarshal([]byte("Alexander Goodword  40  Software"), &p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%+v", p)
+	// Output:
+	// {FirstName:Alexander LastName:Goodword Age:40 Job:Software}
 }

@@ -29,18 +29,8 @@ func NewMarshaler() *Marshaler {
 //
 // Each field in a struct need to be defined a `fixed` tag.
 // The `fixed` tag indicates the maximum width of current field.
-// Example:
-// type foo struct {
-//     bar string `fixed:"5"`
-// }
-// // value longer than `fixed` tag
-// a := foo{bar: "longerthan5"}
-// m.Marshal(a) // will returned []byte("longe") - remain characters are truncated.
-// // value shorter than `fixed` tag
-// b := foo{bar: "less"}
-// m.Marshal(b) // will returned []byte("less ") - a padding space added.
 //
-// If b is slice of struct, Marshal will return multi lines seperated by new line character (\n).
+// If v is slice of struct, Marshal will return multi lines seperated by new line character (\n).
 func (m *Marshaler) Marshal(v interface{}) ([]byte, error) {
 	m.mux.Lock()
 	defer m.mux.Unlock()

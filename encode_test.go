@@ -1,6 +1,8 @@
 package fixedwidth
 
 import (
+	"fmt"
+	"log"
 	"reflect"
 	"testing"
 )
@@ -205,4 +207,21 @@ func TestMarshal(t *testing.T) {
 			}
 		})
 	}
+}
+
+func ExampleMarshaler_Marshal() {
+	p := person{
+		FirstName: "Alexander",
+		LastName:  "Goodword",
+		Age:       40,
+		Job:       "Software Engineer",
+	}
+	m := NewMarshaler()
+	b, err := m.Marshal(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Print(string(b))
+	// Output:
+	// Alexander Goodword  40  Software
 }
