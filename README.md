@@ -1,4 +1,6 @@
 # Fixedwidth
+# Fixedwidth
+[![Buy Me a Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/huydang)
 [![Build Status](https://travis-ci.org/huydang284/fixedwidth.svg?branch=master)](https://travis-ci.org/huydang284/fixedwidth)
 [![Report](https://goreportcard.com/badge/github.com/huydang284/fixedwidth)](https://goreportcard.com/badge/github.com/huydang284/fixedwidth)
 [![Code coverage](https://codecov.io/gh/huydang284/fixedwidth/branch/master/graph/badge.svg)](https://codecov.io/gh/huydang284/fixedwidth)
